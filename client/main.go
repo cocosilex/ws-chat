@@ -1,25 +1,41 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
+	"net"
 	"os"
-    "time"
-    "net"
+	"strings"
+	"time"
+
+	"github.com/chzyer/readline"
 	"github.com/gorilla/websocket"
 )
 
+const (
+    Char_reset = "\033[0m"
+    Color_cyan = "\033[36m"
+    Color_green = "\033[32m"
+)
+
+func main() {
+	var serverUrl string
+	fmt.Print("Server url : ")
+	fmt.Scanln(&serverUrl)
+
+	StartClient(serverUrl)
+}
+
 func StartClient(serverUrl string) {
-    dialer := websocket.DefaultDialer
-    dialer.NetDialContext = (&net.Dialer{
-        Resolver: &net.Resolver{
-            PreferGo: false, 
-            StrictErrors: false,
-        },
-        Timeout:   10 * time.Second,
-        KeepAlive: 30 * time.Second,
-    }).DialContext
+	dialer := websocket.DefaultDialer
+	dialer.NetDialContext = (&net.Dialer{
+		Resolver: &net.Resolver{
+			PreferGo:     false,
+			StrictErrors: false,
+		},
+		Timeout:   10 * time.Second,
+		KeepAlive: 30 * time.Second,
+	}).DialContext
 
 	serverURL := "wss://" + serverUrl
 	fmt.Printf("Connecting to server... \n")
@@ -32,42 +48,44 @@ func StartClient(serverUrl string) {
 
 	fmt.Println("Connected established!")
 
+	rl, err := readline.New(Color_green + "> " + Char_reset)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rl.Close()
+
+	log.SetOutput(rl.Stderr())
+
 	go func() {
 		for {
 			_, message, err := conn.ReadMessage()
 			if err != nil {
-				fmt.Println("\nDisconnected from server.")
 				os.Exit(0)
 			}
-			fmt.Printf("\r> %s\n> ", string(message))
+			fmt.Fprintf(rl.Stdout(), Color_cyan + "%s\n" + Char_reset, string(message))
 		}
 	}()
 
-	scanner := bufio.NewScanner(os.Stdin)
-	fmt.Print("> ") 
-	
-	for scanner.Scan() {
-		text := scanner.Text()
+	for {
+		text, err := rl.Readline()
+		if err != nil { 
+			break
+		}
+
+		if strings.TrimSpace(text) == "" {
+			continue
+		}
 
 		if text == "exit" {
 			conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 			break
 		}
 
-		err := conn.WriteMessage(websocket.TextMessage, []byte(text))
+		err = conn.WriteMessage(websocket.TextMessage, []byte(text))
 		if err != nil {
 			log.Printf("Error sending message: %v", err)
 			break
 		}
-
-		fmt.Print("> ")
+		
 	}
-}
-
-func main() {
-    var serverUrl string
-    fmt.Print("Server url : ")
-    fmt.Scanln(&serverUrl)
-
-	StartClient(serverUrl)
 }

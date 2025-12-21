@@ -34,7 +34,7 @@ public class Server extends WebSocketServer {
         synchronized (conns) {
             for(WebSocket c : conns) {
                 if(!c.equals(conn)) {
-                    c.send(message);
+                    c.send("> " + message);
                 }
             }
         }
