@@ -39,7 +39,7 @@ func StartClient(serverUrl string) {
 				fmt.Println("\nDisconnected from server.")
 				os.Exit(0)
 			}
-			fmt.Printf("\r>%s\n> ", string(message))
+			fmt.Printf("\r> %s\n> ", string(message))
 		}
 	}()
 

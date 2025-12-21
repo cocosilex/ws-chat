@@ -4,7 +4,7 @@ import org.java_websocket.server.WebSocketServer;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import java.net.InetSocketAddress;
-import java.util.Collections;
+import java.util.Collection;
 
 public class Server extends WebSocketServer {
 
@@ -30,8 +30,14 @@ public class Server extends WebSocketServer {
     public void onMessage(WebSocket conn, String message) {
         System.out.println("Received: " + message);
         
-        // TODO : not send the message to the sender
-        broadcast(message);
+        Collection<WebSocket> conns = getConnections();
+        synchronized (conns) {
+            for(WebSocket c : conns) {
+                if(!c.equals(conn)) {
+                    c.send(message);
+                }
+            }
+        }
     }
 
     @Override
