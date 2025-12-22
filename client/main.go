@@ -46,7 +46,7 @@ func StartClient(serverUrl string) {
 	}
 	defer conn.Close()
 
-	fmt.Println("Connected established!")
+	fmt.Println("Connection established!")
 
 	rl, err := readline.New(Color_green + "> " + Char_reset)
 	if err != nil {
