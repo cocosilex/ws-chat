@@ -3,12 +3,17 @@
 ![Java](https://img.shields.io/badge/Java-Server-orange)
 
 # Websocket Chat
-This project include a java websocket server and a go client designed to communicate with the server.
+This project includes a Java websocket server and a Go client designed to communicate with the server.
 
-# How to build/use
 ## Client :
-You will need the [go](https://go.dev/) CLI, you can either compile and run it after or directly run by doing `go run main.go`. After you'll need to enter the url of the server you want to connect.
+- Requires the [Go](https://go.dev) CLI.
+- Go to the client directory `cd client`.
+- Start with `go run main.go`.
+- Enter the URL of the server you want to connect to.
 
 ## Server :
-Option 1 : use [docker](https://www.docker.com/), simply run `docker compose up`, it will build/start automatically a container
-Option 2 : use [gradle](https://gradle.org/), you will also need [java 21](https://adoptium.net/temurin/releases?version=21&os=any&arch=any) installed on your machine. Run `gradle build run` to build and start the script.
+- Requires [Docker](https://www.docker.com) **OR** [Gradle](https://gradle.org) + [Java 21](https://adoptium.net/temurin/releases?version=21&os=any&arch=any).
+
+- Navigate to the server directory `cd server`.
+- For Docker, make sure you have the docker compose CLI and simply run `docker compose up`.
+- For Gradle/Java 21, run `gradle build run` and it will build/start the server.
